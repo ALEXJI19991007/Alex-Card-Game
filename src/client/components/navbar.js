@@ -38,7 +38,7 @@ const Navbar = props => {
     return (
         <Bar className="navbar navbar-default navbar-static-top">
             <div className="col-xs-8">
-                <h2>Graham's Solitaire</h2>
+                <h2>Alex Ji's Solitaire</h2>
             </div>
             {rightOptions}
         </Bar>

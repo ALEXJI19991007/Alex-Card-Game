@@ -4,12 +4,13 @@
 import React, {useEffect, useState} from "react";
 import {Link, withRouter} from 'react-router-dom';
 import md5 from "md5";
+import {InfoBlock, InfoData, InfoLabels, ProfileBlockBase, ProfileImage, ShortP} from "./styles";
 
 const gravatarImg = (email, size) => {
     // 1. Trim white space at the start and the end
     // 2. Change to lower case
     // 3. Use md5 to get the hash
-    let gravHash = md5(email.replace(/^\s+|\s+$/gm,'').toLowerCase());
+    let gravHash = md5(email.replace(/^\s+|\s+$/gm, '').toLowerCase());
     // Get the gravatar image.
     return `https://www.gravatar.com/avatar/${gravHash}?s=${size}`;
 }
@@ -49,6 +50,30 @@ const startGame = (userNameOnPage, userLoggedIn) => {
         : undefined;
 }
 
+const ProfileBlock = props => {
+    return (
+        <ProfileBlockBase>
+            <ProfileImage src={gravatarImg(props.primaryEmail, 200)}/>
+            <InfoBlock>
+                <InfoLabels>
+                    <p>Username:</p>
+                    <p>First Name:</p>
+                    <p>Last Name:</p>
+                    <p>City:</p>
+                    <p>Email Address:</p>
+                </InfoLabels>
+                <InfoData>
+                    <ShortP>{props.username}</ShortP>
+                    <ShortP>{props.firstname}</ShortP>
+                    <ShortP>{props.lastname}</ShortP>
+                    <ShortP>{props.city}</ShortP>
+                    <ShortP>{props.primaryEmail}</ShortP>
+                </InfoData>
+            </InfoBlock>
+        </ProfileBlockBase>
+    );
+};
+
 export const Profile = props => {
     const [state, setState] = useState({
         username: "",
@@ -83,27 +108,7 @@ export const Profile = props => {
                 {editProfile(props.match.params.username, props.username)}
             </div>
             <div className="col-sm-8">
-                <div className="row">
-                    <div className="col-sm-1">
-                        <img src={gravatarImg(state.primaryEmail, 200)} alt="Profile Image"/>
-                    </div>
-                    <div className="col-sm-11 row">
-                        <div className="col-sm-6 text-right">
-                            <p><b>Username:</b></p>
-                            <p><b>First Name:</b></p>
-                            <p><b>Last Name:</b></p>
-                            <p><b>City:</b></p>
-                            <p><b>Email Address:</b></p>
-                        </div>
-                        <div className="col-sm-6">
-                            <p id="username">{state.username}</p>
-                            <p id="first_name">{state.firstname}</p>
-                            <p id="last_name">{state.lastname}</p>
-                            <p id="city">{state.city}</p>
-                            <p id="primary_email">{state.primaryEmail}</p>
-                        </div>
-                    </div>
-                </div>
+                <ProfileBlock {...state} />
                 <div className="row">
                     <div className="col-sm-12">
                         <h4>Games Played ({state.games.length}):</h4>

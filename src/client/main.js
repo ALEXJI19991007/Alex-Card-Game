@@ -18,6 +18,7 @@ import Game from "./components/game";
 import Start from "./components/start";
 import Logout from "./components/logout";
 import Results from "./components/results";
+import Edit from "./components/edit";
 
 export class User {
   constructor(username, primary_email) {
@@ -66,6 +67,7 @@ const MyApp = () => {
           <Route exact path="/login" render={props => <Login {...props} logIn={user}/>}/>
           <Route exact path="/logout" render={props => <Logout {...props} user={user}/>}/>
           <Route exact path="/profile/:username" render={props => <Profile {...props} username={user.userData.username}/>}/>
+          <Route exact path="/profile/:username/edit" render={props => <Edit {...props} username={user.userData.username}/>}/>
           <Route exact path="/start" render={props => {
             return user.isLoggedIn() ? <Start {...props} user={user}/> :
                 <Login {...props} logIn={user}/>

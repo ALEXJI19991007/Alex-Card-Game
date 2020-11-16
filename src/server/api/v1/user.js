@@ -116,8 +116,9 @@ module.exports = (app) => {
      * @return {204, no body content} Return status only
      */
     app.put("/v1/user", async (req, res) => {
-        if (!req.session.user)
+        if (!req.session.user) {
             return res.status(401).send({error: "unauthorized"});
+        }
 
         const schema = Joi.object({
             first_name: Joi.string().allow(""),
