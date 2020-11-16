@@ -5,21 +5,13 @@ import {Card} from './card';
 import PropTypes from "prop-types";
 
 import styled from "styled-components";
-
-const CardPile = styled.div`
-        margin: 5px;
-        position: relative;
-        display: inline-block;
-        border: dashed 2px royalblue;
-        border-radius: 3px;
-        width: 105px;
-    `;
+import {CardPile} from "./styles";
 
 export const Pile = props => {
     const cards = props.cards.map((card, index) => {
         let top = props.horizontal ? 0 : index * props.spacing;
         let left = props.horizontal ? index * props.spacing : 0;
-        let isSelected = index >= props.selectedRange[0] && index <= props.selectedRange[1] && props.id === props.selectedPile;
+        let isSelected = props.selectedRange && index >= props.selectedRange[0] && index <= props.selectedRange[1] && props.id === props.selectedPile;
         return <Card
             key={index}
             card={card}
@@ -50,8 +42,8 @@ export const Pile = props => {
 
 Pile.propTypes = {
     cards: PropTypes.arrayOf(PropTypes.object).isRequired,
-    selectedPile: PropTypes.string.isRequired,
-    selectedRange: PropTypes.array.isRequired,
+    selectedPile: PropTypes.string,
+    selectedRange: PropTypes.array,
     onClick: PropTypes.func,
     horizontal: PropTypes.bool,
     spacing: PropTypes.number,

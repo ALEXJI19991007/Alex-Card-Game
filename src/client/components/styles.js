@@ -53,3 +53,24 @@ export const ShortP = styled.p`
     white-space: nowrap;
     text-overflow: ellipsis;
 `;
+
+export const cardRowStyle = {
+    position: "relative",
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    marginBottom: "2em",
+};
+
+export const cardRowGapStyle = {marginLeft: "100px"};
+
+export const CardPile = styled.div`
+        margin: 5px;
+        position: relative;
+        display: inline-block;
+        border: dashed 2px royalblue;
+        border-radius: 3px;
+        width: 105px;
+    `;

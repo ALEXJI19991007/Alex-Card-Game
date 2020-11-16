@@ -19,6 +19,7 @@ import Start from "./components/start";
 import Logout from "./components/logout";
 import Results from "./components/results";
 import Edit from "./components/edit";
+import Screenshot from "./components/screenshot";
 
 export class User {
   constructor(username, primary_email) {
@@ -34,7 +35,7 @@ export class User {
 
   logInHandler(router, userData) {
     this.userData = userData;
-    sessionStorage.setItem("user", JSON.stringify(this));
+    localStorage.setItem("user", JSON.stringify(this));
     router.push(`/profile/${userData.username}`);
   }
 
@@ -43,7 +44,7 @@ export class User {
       username: "",
       primary_email: ""
     }
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
     router.push("/login");
   }
 
@@ -53,7 +54,7 @@ export class User {
 }
 
 const MyApp = () => {
-  let curUser = JSON.parse(sessionStorage.getItem("user"));
+  let curUser = JSON.parse(localStorage.getItem("user"));
 
   const [user, setUser] = useState(curUser === null ?
       new User() : new User(curUser.userData.username, curUser.userData.primary_email));
@@ -74,6 +75,7 @@ const MyApp = () => {
           }}/>
           <Route exact path="/game/:id" render={props => <Game {...props} username={user.userData.username}/>}/>
           <Route exact path="/results/:id"  render={props => <Results {...props}/>}/>
+          <Route exact path="/screenshot/:id/:index"  render={props => <Screenshot {...props}/>}/>
         </div>
       </BrowserRouter>
   );

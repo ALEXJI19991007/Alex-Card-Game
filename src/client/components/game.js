@@ -5,25 +5,12 @@ import React from "react";
 import {withRouter} from 'react-router';
 
 import {Pile} from "./pile";
-
-const cardRowStyle = {
-    position: "relative",
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    marginBottom: "2em",
-};
-
-const cardRowGapStyle = {marginLeft: "100px"};
+import {cardRowGapStyle, cardRowStyle} from "./styles";
 
 export class Game extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            // target: undefined,
-            // startDrag: {x: 0, y: 0},
             pile1: [],
             pile2: [],
             pile3: [],
@@ -53,9 +40,6 @@ export class Game extends React.Component {
     componentDidMount() {
         fetch(`/v1/game/${this.props.match.params.id}`, {
             method: "GET",
-            headers: {
-                'Content-Type': 'application/json',
-            },
         }).then(response => response.json()).then((data) => {
             this.setState({
                 pile1: data.state.pile1,

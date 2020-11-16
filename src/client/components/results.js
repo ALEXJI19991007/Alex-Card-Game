@@ -4,6 +4,7 @@
 import React, {useEffect, useState} from "react";
 import {withRouter} from "react-router";
 import {Link} from "react-router-dom";
+import game from "./game";
 
 const generalResult = (duration, numMoves, points, cardsRemaining, ableToMove) => {
     let hours = Math.floor(duration / 3600);
@@ -21,20 +22,22 @@ const generalResult = (duration, numMoves, points, cardsRemaining, ableToMove) =
     );
 }
 
-const Move = ({move, index}) => {
+const Move = ({gameId, move, index}) => {
+    const url = `/screenshot/${gameId}/${index}`;
+    const text = `${move.cards[0].suit} ${move.cards[0].value}, ${move.src} to ${move.dst}`;
     return (
         <tr key={index}>
             <th>{index}</th>
-            {/*<th>{move.duration} seconds</th>*/}
             <th>{move.player}</th>
-            <th>{move.cards[0].suit} {move.cards[0].value}, {move.src} to {move.dst}</th>
+            {/*<th><Link to={{pathname: url, moveProps: {stateIndex: index}}}>{text}</Link></th>*/}
+            <th><Link to={{pathname: url, moveProps: {stateIndex: index}}}>{text}</Link></th>
         </tr>
     );
 }
 
-const moveDetail = (moves) => {
+const moveDetail = (id, moves) => {
     return moves.map((move, index) => {
-        return <Move key={index} move={move} index={index + 1}/>
+        return <Move gameId={id} key={index} move={move} index={index + 1}/>
     });
 };
 
@@ -80,7 +83,7 @@ export const Results = (props) => {
                     {generalResult(state.duration, state.numMoves, state.points, state.cardsRemaining, state.ableToMove)}
                 </div>
                 <div className="row">
-                    <table id="gameTable" className="col-sm-8 table">
+                    <table id="gameTable" className="col-sm-12 table">
                         <thead>
                         <tr>
                             <th>Id</th>
@@ -88,7 +91,7 @@ export const Results = (props) => {
                             <th>Move Details</th>
                         </tr>
                         </thead>
-                        <tbody>{moveDetail(state.moves)}</tbody>
+                        <tbody>{moveDetail(props.match.params.id, state.moves)}</tbody>
                     </table>
                 </div>
             </div>

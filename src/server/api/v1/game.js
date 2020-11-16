@@ -86,7 +86,7 @@ module.exports = (app) => {
                         start: game.start,
                         state: game.state[0],
                         active: game.active,
-                        drawCount:  game.drawCount,
+                        drawCount: game.drawCount,
                         score: game.score,
                         winner: game.winner,
                         moves: game.moves,
@@ -96,6 +96,34 @@ module.exports = (app) => {
             } catch (err) {
                 console.log(err);
                 res.status(404).send({ error: `unknown game: ${req.params.id}` });
+            }
+        }
+    });
+
+    /**
+     * Fetch a particular screenshot of a game
+     *
+     * @param (req.params.id} Id of game to fetch
+     * @return {200} Game information
+     */
+    app.get("/v1/game/:id/:index", async (req, res) => {
+        if (!req.session.user) {
+            res.status(401).send({error: 'unauthorized'});
+        } else {
+            try {
+                let game = await app.models.Game.findById(req.params.id).populate("moves");
+                if (!game) {
+                    res.status(404).send({ error: `Cannot Find Game: ${req.params.id}` });
+                } else {
+                    const stateSize = game.state.length;
+                    const curState = game.state[stateSize - req.params.index - 1];
+                    res.status(200).send({
+                        state: curState
+                    });
+                }
+            } catch (err) {
+                console.log(err);
+                res.status(404).send({ error: `unknown move: ${req.params.id}` });
             }
         }
     });
