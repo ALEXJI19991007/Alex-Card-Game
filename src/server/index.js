@@ -61,7 +61,8 @@ const setupServer = async () => {
   app.models = {
     Game: require("./models/game"),
     Move: require("./models/move"),
-    User: require("./models/user")
+    User: require("./models/user"),
+    GameState: require("./models/game_state")
   };
 
   // Import our routes

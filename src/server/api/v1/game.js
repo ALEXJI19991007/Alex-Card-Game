@@ -40,26 +40,36 @@ module.exports = (app) => {
                     state: []
                 };
                 // Get the initial state of the game
-                newGame.state.push(initialState());
+                let myState = new app.models.GameState(initialState());
+                // Push the state's object id into the array
+                newGame.state.push(myState._id);
+                // Get the new game
                 let game = new app.models.Game(newGame);
-                // Save the game into database
                 try {
-                    await game.save();
-                    let query = {$push: {games: game._id}};
-                    // Save the game to User table
-                    app.models.User.findOneAndUpdate({_id: req.session.user._id}, query, () => {
-                        res.status(201).send({
-                            id: game._id
+                    // Save the initial state into database
+                    await myState.save();
+                    try {
+                        // save the game into database
+                        await game.save();
+                        let query = {$push: {games: game._id}};
+                        // Save the game to User table
+                        app.models.User.findOneAndUpdate({_id: req.session.user._id}, query, () => {
+                            res.status(201).send({
+                                id: game._id
+                            });
                         });
-                    });
+                    } catch (err) {
+                        console.log(`Game Creation Failed: ${err.message}`);
+                        res.status(400).send({error: "failure creating game"});
+                    }
                 } catch (err) {
-                    console.log(`Game Creation Failed: ${err.message}`);
-                    res.status(400).send({error: "failure creating game"});
+                    console.log(`Initial Game State Creation Failed: ${err.message}`);
+                    res.status(400).send({error: "failure creating initial game state"});
                 }
             } catch (err) {
-                let errMsg = err.details[0].message;
-                console.log(`Game Creation Error: ${errMsg}`);
-                res.status(400).send({error: errMsg});
+                //let errMsg = err.details[0].message;
+                console.log(`Game Creation Error: ${err}`);
+                res.status(400).send({error: err});
             }
         }
     });
@@ -75,7 +85,7 @@ module.exports = (app) => {
             res.status(401).send({error: 'unauthorized'});
         } else {
             try {
-                let game = await app.models.Game.findById(req.params.id).populate("moves");
+                let game = await app.models.Game.findById(req.params.id).populate("moves").populate("state");
                 if (!game) {
                     res.status(404).send({ error: `Cannot Find Game: ${req.params.id}` });
                 } else {
@@ -111,7 +121,7 @@ module.exports = (app) => {
             res.status(401).send({error: 'unauthorized'});
         } else {
             try {
-                let game = await app.models.Game.findById(req.params.id).populate("moves");
+                let game = await app.models.Game.findById(req.params.id).populate("state");
                 if (!game) {
                     res.status(404).send({ error: `Cannot Find Game: ${req.params.id}` });
                 } else {
@@ -139,7 +149,7 @@ module.exports = (app) => {
         if (!req.session.user) {
             res.status(401).send({error: 'unauthorized'});
         } else {
-            let game = await app.models.Game.findById(req.params.id).populate("owner").exec();
+            let game = await app.models.Game.findById(req.params.id).populate("owner").populate("state").exec();
             if (!game) {
                 res.status(404).send({ error: `unknown game: ${req.params.id}` });
             } else if (game.owner.username !== move.player) {
@@ -169,13 +179,31 @@ module.exports = (app) => {
                     if (state["discard"].length > 0) {
                         state["discard"][state["discard"].length - 1].up = true;
                     }
+                    // Create a new state
+                    let newState = {
+                        pile1: state.pile1,
+                        pile2: state.pile2,
+                        pile3: state.pile3,
+                        pile4: state.pile4,
+                        pile5: state.pile5,
+                        pile6: state.pile6,
+                        pile7: state.pile7,
+                        stack1: state.stack1,
+                        stack2: state.stack2,
+                        stack3: state.stack3,
+                        stack4: state.stack4,
+                        draw: state.draw,
+                        discard: state.discard
+                    }
+                    let stateCreate = new app.models.GameState(newState);
                     // Push the state to game.state (to the left)
                     // Note that unshift has time complexity O(1) since it is a deque
-                    game.state.unshift(state);
+                    game.state.unshift(stateCreate._id);
                     let newMove = new app.models.Move(move);
                     game.moves.push(newMove._id);
                     try {
                         await newMove.save();
+                        await stateCreate.save();
                         try {
                             await game.save();
                             res.status(202).send(state);
