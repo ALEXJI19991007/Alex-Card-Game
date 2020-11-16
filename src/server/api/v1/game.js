@@ -24,7 +24,7 @@ module.exports = (app) => {
                 draw: Joi.any()
             });
             try {
-                let data = await schema.validateAsync(req.body);
+                let data = await schema.validateAsync(req.body, { stripUnknown: true });
                 // newGame object
                 let newGame = {
                     owner: req.session.user._id,
@@ -67,9 +67,10 @@ module.exports = (app) => {
                     res.status(400).send({error: "failure creating initial game state"});
                 }
             } catch (err) {
-                //let errMsg = err.details[0].message;
-                console.log(`Game Creation Error: ${err}`);
-                res.status(400).send({error: err});
+                console.log(err);
+                const message = err.details[0].message;
+                console.log(`Game.create validation failure: ${message}`);
+                res.status(400).send({ error: message });
             }
         }
     });
