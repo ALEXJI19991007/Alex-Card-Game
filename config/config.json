@@ -1,0 +1,25 @@
+{
+  "url": "http://localhost",
+  "api_version": "/v1",
+  "mongodb": "mongodb://localhost:27017/jiy3",
+  "port": 8080,
+  "environments" : {
+    "test": {
+      "mongodb": "mongodb://localhost:27017/testing",
+      "port": 8081
+    },
+    "travis": {
+      "mongodb": "mongodb://127.0.0.1:27017/testing"
+    },
+    "production": {
+      "url": "https://assignment5.rosterlink.org",
+      "mongodb": "mongodb://localhost:27017/heminggs",
+      "port": 443,
+      "security": {
+        "keyPath": "/etc/letsencrypt/live/assignment5.rosterlink.org/privkey.pem",
+        "certPath": "/etc/letsencrypt/live/assignment5.rosterlink.org/cert.pem",
+        "caPath": "/etc/letsencrypt/live/assignment5.rosterlink.org/fullchain.pem"
+      }
+    }
+  }
+}
