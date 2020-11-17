@@ -179,8 +179,8 @@ const validateStackToPile = (state, srcStackName, dstPileName) => {
     // 3.1: Ace, Jack, Queen, King Involved
     let queenToJack = srcCard.value === "queen" && dstCard.value === "king";
     let jackToQueen = srcCard.value === "jack" && dstCard.value === "queen";
-    let tenToJack = srcCard.value === 10 && dstCard.value === "jack";
-    let aceToTwo = srcCard.value === "ace" && dstCard.value === 2;
+    let tenToJack = srcCard.value === "10" && dstCard.value === "jack";
+    let aceToTwo = srcCard.value === "ace" && dstCard.value === "2";
     // 3.2: Normal Numbers
     // Case 4: Other Illegal Moves
     return queenToJack || jackToQueen || tenToJack || aceToTwo || dstCard.value - srcCard.value === 1;

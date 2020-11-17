@@ -64,7 +64,7 @@ export class Game extends React.Component {
         });
     }
 
-    onCardClick(cardInfo) {
+    async onCardClick(cardInfo) {
         let isSelectedCard = cardInfo.hasOwnProperty("card");
         let isSrcCardUnselected = this.state.srcCard === null;
 
@@ -82,7 +82,7 @@ export class Game extends React.Component {
                 srcCard: null,
                 dstCard: null
             });
-            this.sendMove(move);
+            await this.sendMove(move);
         } else if (cardInfo.pile === "draw" && this.state.draw.length === 0) {
             console.log("Reset Draw Pile");
             move = {
@@ -94,7 +94,7 @@ export class Game extends React.Component {
                 srcCard: null,
                 dstCard: null
             });
-            this.sendMove(move);
+            await this.sendMove(move);
         } else if (isSrcCardUnselected && isSelectedCard && cardInfo.card.up) {
             console.log("Set First Card");
             let srcPile = this.state[cardInfo.pile];
@@ -127,45 +127,40 @@ export class Game extends React.Component {
                 srcCard: null,
                 dstCard: null
             });
-            this.sendMove(move);
+            await this.sendMove(move);
         }
     }
 
-    sendMove(move) {
+    async sendMove(move) {
         move.player = this.props.username;
-        fetch(`/v1/game/${this.props.match.params.id}`, {
+        let response = await fetch(`/v1/game/${this.props.match.params.id}`, {
             method: "PUT",
             body: JSON.stringify(move),
             headers: {
                 'Content-Type': 'application/json',
             },
-        }).then(response => {
-            if (response.status === 202) {
-                console.log(move);
-                response.json().then(data => {
-                    this.setState({
-                        pile1: data.pile1,
-                        pile2: data.pile2,
-                        pile3: data.pile3,
-                        pile4: data.pile4,
-                        pile5: data.pile5,
-                        pile6: data.pile6,
-                        pile7: data.pile7,
-                        stack1: data.stack1,
-                        stack2: data.stack2,
-                        stack3: data.stack3,
-                        stack4: data.stack4,
-                        draw: data.draw,
-                        discard: data.discard,
-                    });
-                });
-                return true;
-            }
-            return false;
-        }).catch((error) => {
-            console.log("Error: ", error);
-            return false;
-        });
+        })
+        if (response.status === 202) {
+            console.log(move);
+            let data = await response.json();
+            this.setState({
+                pile1: data.pile1,
+                pile2: data.pile2,
+                pile3: data.pile3,
+                pile4: data.pile4,
+                pile5: data.pile5,
+                pile6: data.pile6,
+                pile7: data.pile7,
+                stack1: data.stack1,
+                stack2: data.stack2,
+                stack3: data.stack3,
+                stack4: data.stack4,
+                draw: data.draw,
+                discard: data.discard,
+            });
+            return true;
+        }
+        return false;
     }
 
     onBackgroundClick(event) {
@@ -186,7 +181,36 @@ export class Game extends React.Component {
         }
     }
 
-    autoComplete(event) {
+    validatePileToStack(srcCards, dstStackName) {
+        if (srcCards.length === 0) {
+            return false;
+        }
+        let dstStack = this.state[dstStackName];
+        let srcCard = srcCards[0];
+
+        // Case 1: Empty dstStack
+        if (dstStack.length === 0) {
+            return srcCard.value === "ace";
+        }
+        let dstCard = dstStack[dstStack.length - 1];
+
+        // Case 2: Occupied Stack
+        if (srcCard.suit !== dstCard.suit) {
+            return false;
+        }
+
+        // Case 3: Legal Moves (srcCard = dstCard + 1)
+        // 3.1: Ace, Jack, Queen, King Involved
+        let kingToQueen = srcCard.value === "king" && dstCard.value === "queen";
+        let queenToJack = srcCard.value === "queen" && dstCard.value === "jack";
+        let jackToTen = srcCard.value === "jack" && dstCard.value === "10";
+        let twoToAce = srcCard.value === "2" && dstCard.value === "ace";
+        // 3.2: Normal Numbers
+        // Case 4: Other Illegal Moves
+        return kingToQueen || queenToJack || jackToTen || twoToAce || srcCard.value - dstCard.value === 1;
+    }
+
+    async autoComplete(event) {
         event.preventDefault();
         let movedLastRound = true;
         while (movedLastRound) {
@@ -195,14 +219,16 @@ export class Game extends React.Component {
                 let srcPile = this.state[`pile${i}`];
                 let srcCards = srcPile.slice(-1);
                 for (let j = 1; j <= 4; ++j) {
-                    let moved = this.sendMove({
-                        cards: srcCards,
-                        src: `pile${i}`,
-                        dst: `stack${j}`
-                    });
-                    if (moved) {
-                        movedLastRound = true;
-                        break;
+                    if (this.validatePileToStack(srcCards, `stack${j}`)) {
+                        let moved = await this.sendMove({
+                            cards: srcCards,
+                            src: `pile${i}`,
+                            dst: `stack${j}`
+                        });
+                        if (moved) {
+                            movedLastRound = true;
+                            break;
+                        }
                     }
                 }
             }
