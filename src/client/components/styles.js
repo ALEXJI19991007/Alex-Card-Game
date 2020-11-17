@@ -66,6 +66,8 @@ export const cardRowStyle = {
 
 export const cardRowGapStyle = {marginLeft: "100px"};
 
+export const autoCompleteButtonStyle = {marginLeft: "100px", marginTop: "50px"};
+
 export const CardPile = styled.div`
         margin: 5px;
         position: relative;

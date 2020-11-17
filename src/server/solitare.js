@@ -246,7 +246,7 @@ const validateMove = (state, move) => {
     if (state["discard"].length > 0) {
         state["discard"][state["discard"].length - 1].up = true;
     }
-    const newState = {
+    return {
         pile1: state.pile1,
         pile2: state.pile2,
         pile3: state.pile3,
@@ -260,8 +260,7 @@ const validateMove = (state, move) => {
         stack4: state.stack4,
         draw: state.draw,
         discard: state.discard
-    }
-    return newState;
+    };
 }
 
 module.exports = {

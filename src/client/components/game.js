@@ -5,7 +5,7 @@ import React from "react";
 import {withRouter} from 'react-router';
 
 import {Pile} from "./pile";
-import {cardRowGapStyle, cardRowStyle} from "./styles";
+import {autoCompleteButtonStyle, cardRowGapStyle, cardRowStyle} from "./styles";
 
 export class Game extends React.Component {
     constructor(props) {
@@ -35,6 +35,7 @@ export class Game extends React.Component {
         this.onBackgroundClick = this.onBackgroundClick.bind(this);
         this.sendMove = this.sendMove.bind(this);
         this.onPressEsc = this.onPressEsc.bind(this);
+        this.autoComplete = this.autoComplete.bind(this);
     }
 
     componentDidMount() {
@@ -131,7 +132,6 @@ export class Game extends React.Component {
     }
 
     sendMove(move) {
-        console.log(move);
         move.player = this.props.username;
         fetch(`/v1/game/${this.props.match.params.id}`, {
             method: "PUT",
@@ -141,6 +141,7 @@ export class Game extends React.Component {
             },
         }).then(response => {
             if (response.status === 202) {
+                console.log(move);
                 response.json().then(data => {
                     this.setState({
                         pile1: data.pile1,
@@ -158,9 +159,12 @@ export class Game extends React.Component {
                         discard: data.discard,
                     });
                 });
+                return true;
             }
+            return false;
         }).catch((error) => {
             console.log("Error: ", error);
+            return false;
         });
     }
 
@@ -182,27 +186,57 @@ export class Game extends React.Component {
         }
     }
 
+    autoComplete(event) {
+        event.preventDefault();
+        let movedLastRound = true;
+        while (movedLastRound) {
+            movedLastRound = false;
+            for (let i = 1; i <= 7; ++i) {
+                let srcPile = this.state[`pile${i}`];
+                let srcCards = srcPile.slice(-1);
+                for (let j = 1; j <= 4; ++j) {
+                    let moved = this.sendMove({
+                        cards: srcCards,
+                        src: `pile${i}`,
+                        dst: `stack${j}`
+                    });
+                    if (moved) {
+                        movedLastRound = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     render() {
         return (
-            <div onClick={this.onBackgroundClick}>
-                <div className="card-row" style={cardRowStyle} onClick={this.onBackgroundClick}>
-                    <Pile cards={this.state.stack1} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack1" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.stack2} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack2" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.stack3} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack3" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.stack4} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack4" onClick={this.onCardClick}/>
-                    <div className="card-row-gap" style={cardRowGapStyle} onClick={this.onBackgroundClick}>
-                        <Pile cards={this.state.draw} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="draw" onClick={this.onCardClick}/>
-                        <Pile cards={this.state.discard} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="discard" onClick={this.onCardClick}/>
-                    </div>
+            <div className="row">
+                <div className="col-sm-2">
+                    <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.autoComplete}>
+                        Auto-Complete
+                    </button>
                 </div>
-                <div className="card-row" style={cardRowStyle} onClick={this.onBackgroundClick}>
-                    <Pile cards={this.state.pile1} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile1" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.pile2} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile2" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.pile3} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile3" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.pile4} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile4" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.pile5} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile5" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.pile6} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile6" onClick={this.onCardClick}/>
-                    <Pile cards={this.state.pile7} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile7" onClick={this.onCardClick}/>
+                <div className="col-sm-8" onClick={this.onBackgroundClick}>
+                    <div className="card-row" style={cardRowStyle} onClick={this.onBackgroundClick}>
+                        <Pile cards={this.state.stack1} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack1" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.stack2} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack2" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.stack3} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack3" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.stack4} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack4" onClick={this.onCardClick}/>
+                        <div className="card-row-gap" style={cardRowGapStyle} onClick={this.onBackgroundClick}>
+                            <Pile cards={this.state.draw} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="draw" onClick={this.onCardClick}/>
+                            <Pile cards={this.state.discard} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="discard" onClick={this.onCardClick}/>
+                        </div>
+                    </div>
+                    <div className="card-row" style={cardRowStyle} onClick={this.onBackgroundClick}>
+                        <Pile cards={this.state.pile1} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile1" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.pile2} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile2" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.pile3} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile3" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.pile4} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile4" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.pile5} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile5" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.pile6} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile6" onClick={this.onCardClick}/>
+                        <Pile cards={this.state.pile7} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile7" onClick={this.onCardClick}/>
+                    </div>
                 </div>
             </div>
         );
