@@ -83,7 +83,7 @@ export const Results = (props) => {
                     {generalResult(state.duration, state.numMoves, state.points, state.cardsRemaining, state.ableToMove)}
                 </div>
                 <div className="row">
-                    <table id="gameTable" className="col-sm-12 table">
+                    <table id="gameTable" className="col-sm-8 table">
                         <thead>
                         <tr>
                             <th>Id</th>

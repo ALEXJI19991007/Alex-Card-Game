@@ -158,45 +158,10 @@ module.exports = (app) => {
                 console.log("Mover: " + move.player);
                 res.status(401).send({error: 'unauthorized'});
             } else {
-                let state = game.state[0];
-                if (validateMove(state, move)) {
-                    let src = move.src;
-                    let dst = move.dst;
-                    let cards = move.cards;
-                    // Update state
-                    state[src] = state[src].slice(0, -cards.length);
-                    state[dst] = state[dst].concat(cards);
-                    // Change the bottom card to face upwards if needed
-                    if (src !== "draw" && state[src].length > 0) {
-                        state[src][state[src].length - 1].up = true;
-                    }
-                    // Make sure all cards in the draw pile is facing downwards
-                    if (dst === "draw") {
-                        for (let i = 0; i < state["draw"].length; ++i) {
-                            state["draw"][i].up = false;
-                        }
-                    }
-                    // Change the top card in discard pile to face upwards
-                    if (state["discard"].length > 0) {
-                        state["discard"][state["discard"].length - 1].up = true;
-                    }
+                let state = validateMove(game.state[0], move);
+                if (state !== null) {
                     // Create a new state
-                    let newState = {
-                        pile1: state.pile1,
-                        pile2: state.pile2,
-                        pile3: state.pile3,
-                        pile4: state.pile4,
-                        pile5: state.pile5,
-                        pile6: state.pile6,
-                        pile7: state.pile7,
-                        stack1: state.stack1,
-                        stack2: state.stack2,
-                        stack3: state.stack3,
-                        stack4: state.stack4,
-                        draw: state.draw,
-                        discard: state.discard
-                    }
-                    let stateCreate = new app.models.GameState(newState);
+                    let stateCreate = new app.models.GameState(state);
                     // Push the state to game.state (to the left)
                     // Note that unshift has time complexity O(1) since it is a deque
                     game.state.unshift(stateCreate._id);

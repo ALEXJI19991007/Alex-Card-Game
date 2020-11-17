@@ -57,6 +57,7 @@ export class Game extends React.Component {
                 discard: data.state.discard,
                 drawCount: data.drawCount,
             });
+            document.addEventListener("keydown", this.onPressEsc, false);
         }).catch((error) => {
             console.log("Error: ", error);
         });
@@ -183,7 +184,7 @@ export class Game extends React.Component {
 
     render() {
         return (
-            <div onClick={this.onBackgroundClick} onKeyDown={this.onPressEsc}>
+            <div onClick={this.onBackgroundClick}>
                 <div className="card-row" style={cardRowStyle} onClick={this.onBackgroundClick}>
                     <Pile cards={this.state.stack1} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack1" onClick={this.onCardClick}/>
                     <Pile cards={this.state.stack2} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} spacing={0} id="stack2" onClick={this.onCardClick}/>

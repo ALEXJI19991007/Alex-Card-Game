@@ -186,7 +186,7 @@ const validateStackToPile = (state, srcStackName, dstPileName) => {
     return queenToJack || jackToQueen || tenToJack || aceToTwo || dstCard.value - srcCard.value === 1;
 }
 
-const validateMove = (currentState, requestedMove) => {
+const validateMoveHelper = (currentState, requestedMove) => {
     let cards = requestedMove.cards;
     let src = requestedMove.src;
     let dst = requestedMove.dst;
@@ -221,6 +221,48 @@ const validateMove = (currentState, requestedMove) => {
     // Draw to Discard / Discard All Back to Draw
     return (srcIsDraw && dstIsDiscard) || (srcIsDiscard && dstIsDraw);
 };
+
+const validateMove = (state, move) => {
+    if (!validateMoveHelper(state, move)) {
+        return null;
+    }
+    let src = move.src;
+    let dst = move.dst;
+    let cards = move.cards;
+    // Update state
+    state[src] = state[src].slice(0, -cards.length);
+    state[dst] = state[dst].concat(cards);
+    // Change the bottom card to face upwards if needed
+    if (src !== "draw" && state[src].length > 0) {
+        state[src][state[src].length - 1].up = true;
+    }
+    // Make sure all cards in the draw pile is facing downwards
+    if (dst === "draw") {
+        for (let i = 0; i < state["draw"].length; ++i) {
+            state["draw"][i].up = false;
+        }
+    }
+    // Change the top card in discard pile to face upwards
+    if (state["discard"].length > 0) {
+        state["discard"][state["discard"].length - 1].up = true;
+    }
+    const newState = {
+        pile1: state.pile1,
+        pile2: state.pile2,
+        pile3: state.pile3,
+        pile4: state.pile4,
+        pile5: state.pile5,
+        pile6: state.pile6,
+        pile7: state.pile7,
+        stack1: state.stack1,
+        stack2: state.stack2,
+        stack3: state.stack3,
+        stack4: state.stack4,
+        draw: state.draw,
+        discard: state.discard
+    }
+    return newState;
+}
 
 module.exports = {
     shuffleCards: shuffleCards,
