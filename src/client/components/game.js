@@ -29,6 +29,7 @@ export class Game extends React.Component {
             srcCard: null,
             dstCard: null,
             drawCount: null,
+            stateIndex: null,
         };
 
         this.onCardClick = this.onCardClick.bind(this);
@@ -36,6 +37,8 @@ export class Game extends React.Component {
         this.sendMove = this.sendMove.bind(this);
         this.onPressEsc = this.onPressEsc.bind(this);
         this.autoComplete = this.autoComplete.bind(this);
+        this.undo = this.undo.bind(this);
+        this.redo = this.redo.bind(this);
     }
 
     componentDidMount() {
@@ -57,6 +60,7 @@ export class Game extends React.Component {
                 draw: data.state.draw,
                 discard: data.state.discard,
                 drawCount: data.drawCount,
+                stateIndex: data.state.stateIndex
             });
             document.addEventListener("keydown", this.onPressEsc, false);
         }).catch((error) => {
@@ -133,6 +137,7 @@ export class Game extends React.Component {
 
     async sendMove(move) {
         move.player = this.props.username;
+        move.curStateIndex = this.state.stateIndex;
         let response = await fetch(`/v1/game/${this.props.match.params.id}`, {
             method: "PUT",
             body: JSON.stringify(move),
@@ -157,6 +162,7 @@ export class Game extends React.Component {
                 stack4: data.stack4,
                 draw: data.draw,
                 discard: data.discard,
+                stateIndex: data.stateIndex
             });
             return true;
         }
@@ -235,12 +241,93 @@ export class Game extends React.Component {
         }
     }
 
+    async undo(event) {
+        event.preventDefault();
+        if (this.state.stateIndex === 0) {
+            return;
+        }
+        let undoMove = {
+            player: this.props.username,
+            curStateIndex: this.state.stateIndex,
+            moveType: "undo"
+        }
+        let response = await fetch(`/v1/game/${this.props.match.params.id}`, {
+            method: "POST",
+            body: JSON.stringify(undoMove),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        if (response.status === 202) {
+            let data = await response.json();
+            console.log(`Undo to state ${data.stateIndex}`);
+            this.setState({
+                pile1: data.pile1,
+                pile2: data.pile2,
+                pile3: data.pile3,
+                pile4: data.pile4,
+                pile5: data.pile5,
+                pile6: data.pile6,
+                pile7: data.pile7,
+                stack1: data.stack1,
+                stack2: data.stack2,
+                stack3: data.stack3,
+                stack4: data.stack4,
+                draw: data.draw,
+                discard: data.discard,
+                stateIndex: data.stateIndex
+            });
+        }
+    }
+
+    async redo(event) {
+        event.preventDefault();
+        let redoMove = {
+            player: this.props.username,
+            curStateIndex: this.state.stateIndex,
+            moveType: "redo"
+        }
+        let response = await fetch(`/v1/game/${this.props.match.params.id}`, {
+            method: "POST",
+            body: JSON.stringify(redoMove),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        if (response.status === 202) {
+            let data = await response.json();
+            console.log(`Redo to state ${data.stateIndex}`);
+            this.setState({
+                pile1: data.pile1,
+                pile2: data.pile2,
+                pile3: data.pile3,
+                pile4: data.pile4,
+                pile5: data.pile5,
+                pile6: data.pile6,
+                pile7: data.pile7,
+                stack1: data.stack1,
+                stack2: data.stack2,
+                stack3: data.stack3,
+                stack4: data.stack4,
+                draw: data.draw,
+                discard: data.discard,
+                stateIndex: data.stateIndex
+            });
+        }
+    }
+
     render() {
         return (
             <div className="row">
                 <div className="col-sm-2">
                     <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.autoComplete}>
                         Auto-Complete
+                    </button>
+                    <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.undo}>
+                        Undo
+                    </button>
+                    <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.redo}>
+                        Redo
                     </button>
                 </div>
                 <div className="col-sm-8" onClick={this.onBackgroundClick}>

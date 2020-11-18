@@ -90,12 +90,12 @@ module.exports = (app) => {
                 if (!game) {
                     res.status(404).send({ error: `Cannot Find Game: ${req.params.id}` });
                 } else {
-                    const curState = game.state[0];
+                    const curState = game.state[game.state.length - 1];
                     const cardsRemaining = 52 - curState.stack1.length - curState.stack2.length - curState.stack3.length - curState.stack4.length;
                     res.status(200).send({
                         id: game.id,
                         start: game.start,
-                        state: game.state[0],
+                        state: game.state[game.state.length - 1],
                         active: game.active,
                         drawCount: game.drawCount,
                         score: game.score,
@@ -126,8 +126,7 @@ module.exports = (app) => {
                 if (!game) {
                     res.status(404).send({ error: `Cannot Find Game: ${req.params.id}` });
                 } else {
-                    const stateSize = game.state.length;
-                    const curState = game.state[stateSize - req.params.index - 1];
+                    const curState = game.state[req.params.index];
                     res.status(200).send({
                         state: curState
                     });
@@ -158,13 +157,39 @@ module.exports = (app) => {
                 console.log("Mover: " + move.player);
                 res.status(401).send({error: 'unauthorized'});
             } else {
-                let state = validateMove(game.state[0], move);
+                let state = validateMove(game.state[move.curStateIndex], move);
                 if (state !== null) {
                     // Create a new state
                     let stateCreate = new app.models.GameState(state);
-                    // Push the state to game.state (to the left)
-                    // Note that unshift has time complexity O(1) since it is a deque
-                    game.state.unshift(stateCreate._id);
+                    // Check if we have to delete overwritten states & moves
+                    if (stateCreate.stateIndex < game.state.length) {
+                        let stateToKeep = game.state.slice(0, stateCreate.stateIndex);
+                        let stateToDelete = game.state.slice(stateCreate.stateIndex);
+                        let movesToKeep = game.moves.slice(0, move.curStateIndex);
+                        let movesToDelete = game.moves.slice(move.curStateIndex);
+                        game.state = stateToKeep;
+                        game.moves = movesToKeep;
+                        // Delete state from DB
+                        stateToDelete.map(async oneState => {
+                            try {
+                                await app.models.GameState.findByIdAndDelete(oneState._id);
+                            } catch (err) {
+                                console.log(`state-deletion failed: ${err.message}`);
+                                res.status(500).send({error: "failure deleting state"});
+                            }
+                        })
+                        // Delete move from DB
+                        movesToDelete.map(async oneMove => {
+                            try {
+                                await app.models.Move.findByIdAndDelete(oneMove._id);
+                            } catch (err) {
+                                console.log(`move-deletion failed: ${err.message}`);
+                                res.status(500).send({error: "failure deleting move"});
+                            }
+                        })
+                    }
+                    // Push the state to game.state
+                    game.state.push(stateCreate._id);
                     let newMove = new app.models.Move(move);
                     game.moves.push(newMove._id);
                     try {
@@ -182,8 +207,46 @@ module.exports = (app) => {
                         res.status(500).send({error: "failure saving move"});
                     }
                 } else {
-                    res.status(400).send({ error: "Invalid Move", state: state });
+                    res.status(400).send({error: "Invalid Move", state: state});
                 }
+            }
+        }
+    });
+
+    /**
+     * Undo a move
+     *
+     * @param (req.params.id} Id of game to update
+     * @return {200} Game information
+     */
+    app.post("/v1/game/:id", async (req, res) => {
+        let action = req.body;
+        if (!req.session.user) {
+            res.status(401).send({error: 'unauthorized'});
+        } else {
+            let game = await app.models.Game.findById(req.params.id).populate("owner").populate("state").exec();
+            if (!game) {
+                res.status(404).send({ error: `unknown game: ${req.params.id}` });
+            } else if (game.owner.username !== action.player) {
+                console.log("Owner: " + game.owner.username);
+                console.log("Mover: " + action.player);
+                res.status(401).send({error: 'unauthorized'});
+            } else if (action.moveType === "undo") {
+                // Get the previous state
+                let prevState = game.state[action.curStateIndex - 1];
+                res.status(202).send(prevState);
+            } else if (action.moveType === "redo") {
+                // Get the next state
+                console.log("Index: " + action.curStateIndex);
+                console.log("LengthL " + game.state.length);
+                if (action.curStateIndex === game.state.length - 1) {
+                    res.status(202).send(game.state[action.curStateIndex]);
+                } else {
+                    let nextState = game.state[action.curStateIndex + 1];
+                    res.status(202).send(nextState);
+                }
+            } else {
+                res.status(400).send({error: "Invalid Action"});
             }
         }
     });

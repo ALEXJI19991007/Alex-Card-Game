@@ -17,7 +17,8 @@ const GameState = new Schema({
     stack3:     { type: [CardState] },
     stack4:     { type: [CardState] },
     draw:       { type: [CardState] },
-    discard:    { type: [CardState] }
+    discard:    { type: [CardState] },
+    stateIndex: { type: Number }
 });
 
 GameState.pre("validate", function (next) {

@@ -29,8 +29,7 @@ const Move = ({gameId, move, index}) => {
         <tr key={index}>
             <th>{index}</th>
             <th>{move.player}</th>
-            {/*<th><Link to={{pathname: url, moveProps: {stateIndex: index}}}>{text}</Link></th>*/}
-            <th><Link to={{pathname: url, moveProps: {stateIndex: index}}}>{text}</Link></th>
+            <th><Link to={{pathname: url}}>{text}</Link></th>
         </tr>
     );
 }

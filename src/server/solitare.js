@@ -41,7 +41,8 @@ const initialState = () => {
         stack3: [],
         stack4: [],
         draw: [],
-        discard: []
+        discard: [],
+        stateIndex: 0,
     };
 
     // Get the shuffled deck and distribute it to the players
@@ -259,7 +260,8 @@ const validateMove = (state, move) => {
         stack3: state.stack3,
         stack4: state.stack4,
         draw: state.draw,
-        discard: state.discard
+        discard: state.discard,
+        stateIndex: state.stateIndex + 1
     };
 }
 
