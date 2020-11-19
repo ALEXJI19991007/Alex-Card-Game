@@ -156,10 +156,12 @@ module.exports = (app) => {
                 console.log("Owner: " + game.owner.username);
                 console.log("Mover: " + move.player);
                 res.status(401).send({error: 'unauthorized'});
-            } else {
+            } else if (move.action === "move") {
+                // Call function to validate the move
+                // Will return a state after the move if it is valid, null otherwise
                 let state = validateMove(game.state[move.curStateIndex], move);
                 if (state !== null) {
-                    // Create a new state
+                    // Create a new state model
                     let stateCreate = new app.models.GameState(state);
                     // Check if we have to delete overwritten states & moves
                     if (stateCreate.stateIndex < game.state.length) {
@@ -208,6 +210,15 @@ module.exports = (app) => {
                     }
                 } else {
                     res.status(400).send({error: "Invalid Move", state: state});
+                }
+            } else {
+                game.active = false;
+                try {
+                    await game.save();
+                    res.status(202).send({active: false});
+                } catch (err) {
+                    console.log(`game-saving failed: ${err.message}`);
+                    res.status(500).send({error: "failure update game"});
                 }
             }
         }

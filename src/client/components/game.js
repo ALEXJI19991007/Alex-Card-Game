@@ -30,6 +30,8 @@ export class Game extends React.Component {
             dstCard: null,
             drawCount: null,
             stateIndex: null,
+            active: null,
+            endGame: false
         };
 
         this.onCardClick = this.onCardClick.bind(this);
@@ -39,12 +41,15 @@ export class Game extends React.Component {
         this.autoComplete = this.autoComplete.bind(this);
         this.undo = this.undo.bind(this);
         this.redo = this.redo.bind(this);
+        this.endGame = this.endGame.bind(this);
+        this.checkEndGame = this.checkEndGame.bind(this);
     }
 
     componentDidMount() {
         fetch(`/v1/game/${this.props.match.params.id}`, {
             method: "GET",
         }).then(response => response.json()).then((data) => {
+            let end = this.checkEndGame(data.state);
             this.setState({
                 pile1: data.state.pile1,
                 pile2: data.state.pile2,
@@ -60,7 +65,9 @@ export class Game extends React.Component {
                 draw: data.state.draw,
                 discard: data.state.discard,
                 drawCount: data.drawCount,
-                stateIndex: data.state.stateIndex
+                stateIndex: data.state.stateIndex,
+                active: data.active,
+                endGame: end
             });
             document.addEventListener("keydown", this.onPressEsc, false);
         }).catch((error) => {
@@ -69,6 +76,11 @@ export class Game extends React.Component {
     }
 
     async onCardClick(cardInfo) {
+        // Cannot click on card if the game status is not active
+        if (!this.state.active) {
+            return;
+        }
+
         let isSelectedCard = cardInfo.hasOwnProperty("card");
         let isSrcCardUnselected = this.state.srcCard === null;
 
@@ -138,6 +150,7 @@ export class Game extends React.Component {
     async sendMove(move) {
         move.player = this.props.username;
         move.curStateIndex = this.state.stateIndex;
+        move.action = "move";
         let response = await fetch(`/v1/game/${this.props.match.params.id}`, {
             method: "PUT",
             body: JSON.stringify(move),
@@ -148,6 +161,7 @@ export class Game extends React.Component {
         if (response.status === 202) {
             console.log(move);
             let data = await response.json();
+            let end = this.checkEndGame(data);
             this.setState({
                 pile1: data.pile1,
                 pile2: data.pile2,
@@ -162,7 +176,8 @@ export class Game extends React.Component {
                 stack4: data.stack4,
                 draw: data.draw,
                 discard: data.discard,
-                stateIndex: data.stateIndex
+                stateIndex: data.stateIndex,
+                endGame: end
             });
             return true;
         }
@@ -187,11 +202,11 @@ export class Game extends React.Component {
         }
     }
 
-    validatePileToStack(srcCards, dstStackName) {
+    validatePileToStack(state, srcCards, dstStackName) {
         if (srcCards.length === 0) {
             return false;
         }
-        let dstStack = this.state[dstStackName];
+        let dstStack = state[dstStackName];
         let srcCard = srcCards[0];
 
         // Case 1: Empty dstStack
@@ -216,19 +231,33 @@ export class Game extends React.Component {
         return kingToQueen || queenToJack || jackToTen || twoToAce || srcCard.value - dstCard.value === 1;
     }
 
+    checkEndGame(state) {
+        // Check 7 piles & discard pile
+        for (let i = 1; i <= 8; ++i) {
+            let srcPile = i < 8 ? state[`pile${i}`] : state.discard;
+            let srcCards = srcPile.slice(-1);
+            for (let j = 1; j <= 4; ++j) {
+                if (this.validatePileToStack(state, srcCards, `stack${j}`)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     async autoComplete(event) {
         event.preventDefault();
         let movedLastRound = true;
         while (movedLastRound) {
             movedLastRound = false;
-            for (let i = 1; i <= 7; ++i) {
-                let srcPile = this.state[`pile${i}`];
+            for (let i = 1; i <= 8; ++i) {
+                let srcPile = i < 8 ? this.state[`pile${i}`] : this.state.discard;
                 let srcCards = srcPile.slice(-1);
                 for (let j = 1; j <= 4; ++j) {
-                    if (this.validatePileToStack(srcCards, `stack${j}`)) {
+                    if (this.validatePileToStack(this.state, srcCards, `stack${j}`)) {
                         let moved = await this.sendMove({
                             cards: srcCards,
-                            src: `pile${i}`,
+                            src: i < 8 ? `pile${i}` : "discard",
                             dst: `stack${j}`
                         });
                         if (moved) {
@@ -316,19 +345,63 @@ export class Game extends React.Component {
         }
     }
 
+    async endGame(event) {
+        event.preventDefault();
+        let req = { player: this.props.username, action: "end" };
+        let response = await fetch(`/v1/game/${this.props.match.params.id}`, {
+            method: "PUT",
+            body: JSON.stringify(req),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        let data = await response.json();
+        if (response.status === 202) {
+            console.log("End Game");
+            this.setState({
+                active: data.active
+            });
+        } else {
+            console.log(data.error);
+        }
+    }
+
+    getEndButton() {
+        return this.state.active ?
+        <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} disabled={!this.state.endGame} onClick={this.endGame}>
+            End Game
+        </button> : undefined;
+    }
+
+    getAutoCompleteButton() {
+        return this.state.active ?
+            <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} disabled={this.state.endGame} onClick={this.autoComplete}>
+                Auto-Complete
+            </button> : undefined;
+    }
+
+    getUndoButton() {
+        return this.state.active ?
+            <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.undo}>
+                Undo
+            </button> : undefined;
+    }
+
+    getRedoButton() {
+        return this.state.active ?
+            <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.redo}>
+                Redo
+            </button> : undefined;
+    }
+
     render() {
         return (
             <div className="row">
                 <div className="col-sm-2">
-                    <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.autoComplete}>
-                        Auto-Complete
-                    </button>
-                    <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.undo}>
-                        Undo
-                    </button>
-                    <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.redo}>
-                        Redo
-                    </button>
+                    {this.getAutoCompleteButton()}
+                    {this.getUndoButton()}
+                    {this.getRedoButton()}
+                    {this.getEndButton()}
                 </div>
                 <div className="col-sm-8" onClick={this.onBackgroundClick}>
                     <div className="card-row" style={cardRowStyle} onClick={this.onBackgroundClick}>

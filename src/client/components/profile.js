@@ -17,12 +17,12 @@ const gravatarImg = (email, size) => {
 
 const Game = ({game, index}) => {
     let date = new Date(game.start);
-    const activeUrl = game.active ? `/game/${game._id}` : `/results/${game._id}`;
+    const gameUrl = `/game/${game._id}`;
     const resultsUrl = `/results/${game._id}`;
     return (
         <tr key={index}>
             <th>{game.active ? "Active" : "Complete"}</th>
-            <th><Link to={activeUrl}>{"Game"}</Link> / <Link to={resultsUrl}>{"Result"}</Link></th>
+            <th><Link to={gameUrl}>{"Game"}</Link> / <Link to={resultsUrl}>{"Result"}</Link></th>
             <th>{date.toLocaleString()}</th>
             <th>{game.moves.length}</th>
             <th>{game.score}</th>
