@@ -396,8 +396,8 @@ export class Game extends React.Component {
 
     render() {
         return (
-            <div className="row">
-                <div className="col-sm-2">
+            <div className="row" onClick={this.onBackgroundClick}>
+                <div className="col-sm-2" onClick={this.onBackgroundClick}>
                     {this.getAutoCompleteButton()}
                     {this.getUndoButton()}
                     {this.getRedoButton()}

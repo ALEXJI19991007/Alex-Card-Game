@@ -248,8 +248,6 @@ module.exports = (app) => {
                 res.status(202).send(prevState);
             } else if (action.moveType === "redo") {
                 // Get the next state
-                console.log("Index: " + action.curStateIndex);
-                console.log("LengthL " + game.state.length);
                 if (action.curStateIndex === game.state.length - 1) {
                     res.status(202).send(game.state[action.curStateIndex]);
                 } else {
