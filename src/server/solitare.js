@@ -128,7 +128,6 @@ const validatePileToStack = (state, srcPileName, dstStackName) => {
         return false;
     }
     let srcCard = srcPile[srcPile.length - 1];
-    console.log(srcCard);
 
     // Case 1: Empty dstStack
     if (dstStack.length === 0) {
@@ -147,10 +146,8 @@ const validatePileToStack = (state, srcPileName, dstStackName) => {
     let queenToJack = srcCard.value === "queen" && dstCard.value === "jack";
     let jackToTen = srcCard.value === "jack" && dstCard.value === "10";
     let twoToAce = srcCard.value === "2" && dstCard.value === "ace";
-    console.log(srcCard.value + " " + dstCard.value + " " + twoToAce);
     // 3.2: Normal Numbers
     // Case 4: Other Illegal Moves
-    console.log("OK or Not: " + kingToQueen || queenToJack || jackToTen || twoToAce || srcCard.value - dstCard.value === 1);
     return kingToQueen || queenToJack || jackToTen || twoToAce || srcCard.value - dstCard.value === 1;
 }
 
