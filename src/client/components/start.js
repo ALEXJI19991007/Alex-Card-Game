@@ -42,7 +42,7 @@ export const Start = (props) => {
     }
 
     return (
-        <div className="row">
+        <div className="row" style={{marginTop: "20px"}}>
             <div className="col-sm-8 offset-sm-2">
                 <h4>Create New Game</h4>
                 <form className="form-horizontal row">

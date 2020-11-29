@@ -102,7 +102,7 @@ export const Profile = props => {
     }, []);
 
     return (
-        <div className="row">
+        <div className="row" style={{marginTop: "20px"}}>
             <div className="col-sm-2">
                 <h5>Player Profile</h5>
                 {editProfile(props.match.params.username, props.username)}

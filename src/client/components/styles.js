@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from "prop-types";
+import background from "../../../public/images/background.jpg";
 import styled from "styled-components";
 
 export const ProfileBlockBase = styled.div`
@@ -75,4 +75,54 @@ export const CardPile = styled.div`
         border: dashed 2px royalblue;
         border-radius: 3px;
         width: 105px;
+    `;
+
+export const LandingBase = styled.div`
+  display: flex;
+  justify-content: center;
+  grid-area: main;
+`;
+
+export const Bar = styled.div`
+        background: #DF574B;
+    `;
+
+export const RightNav = styled.div`
+        text-align: right;
+        padding-top: 10px;
+        padding-right: 20px;
+    `;
+
+export const topLinkStyle = {marginLeft: "10px", color: "white"};
+
+export const containerHeaderStyle = {
+    alignItems: "center",
+    backgroundImage: `url(${background})`,
+    backgroundSize: "100%",
+    display: "flex",
+    height: "700px",
+    color: "white"
+}
+
+export const titlePart = {
+    borderLeft: "1px solid #FFFFFF",
+    fontWeight: "400",
+    fontSize: "2em",
+    lineHeight: "1em",
+    marginLeft: "120px",
+    paddingLeft: "5px",
+    marginTop: "-100px"
+}
+
+export const Footer = styled.footer`
+        background: #434343;
+        font-size: 0.8em;
+        height: 200px;
+        position: relative;
+        margin-top: -10px;
+    `
+
+export const FooterP = styled.p`
+        text-align: center;
+        color: white;
     `;
