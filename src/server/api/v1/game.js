@@ -142,7 +142,7 @@ module.exports = (app) => {
      * Update game status
      *
      * @param (req.params.id} Id of game to update
-     * @return {200} Game information
+     * @return {202} Game information
      */
     app.put("/v1/game/:id", async (req, res) => {
         let move = req.body;
@@ -194,6 +194,7 @@ module.exports = (app) => {
                     game.state.push(stateCreate._id);
                     let newMove = new app.models.Move(move);
                     game.moves.push(newMove._id);
+                    game.score = game.state.stack1.length + game.state.stack2.length + game.state.stack3.length + game.state.stack4.length;
                     try {
                         await newMove.save();
                         await stateCreate.save();
