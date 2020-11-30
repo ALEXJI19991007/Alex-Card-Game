@@ -194,7 +194,7 @@ module.exports = (app) => {
                     game.state.push(stateCreate._id);
                     let newMove = new app.models.Move(move);
                     game.moves.push(newMove._id);
-                    game.score = game.state.stack1.length + game.state.stack2.length + game.state.stack3.length + game.state.stack4.length;
+                    game.score = stateCreate.stack1.length + stateCreate.stack2.length + stateCreate.stack3.length + stateCreate.stack4.length;
                     try {
                         await newMove.save();
                         await stateCreate.save();
