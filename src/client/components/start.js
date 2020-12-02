@@ -27,7 +27,7 @@ export const Start = (props) => {
         });
         const data = await response.json();
         if (response.ok) {
-            console.log(data);
+            // console.log(data);
             props.history.push(`/game/${data.id}`);
         } else {
             console.log(`Error: ${data.error}`);

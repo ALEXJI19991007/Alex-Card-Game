@@ -11,7 +11,7 @@ export const ProfileBlockBase = styled.div`
   @media (min-width: 500px) {
     grid-template-columns: auto 1fr;
     grid-template-areas: 'pic profile';
-    padding: 2em;
+    padding: 0em;
   }
 `;
 
@@ -62,11 +62,13 @@ export const cardRowStyle = {
     justifyContent: "center",
     alignItems: "flex-start",
     marginBottom: "2em",
+    marginTop: "20px"
 };
 
 export const cardRowGapStyle = {marginLeft: "100px"};
 
-export const autoCompleteButtonStyle = {marginLeft: "100px", marginTop: "50px"};
+export const autoCompleteButtonStyle = {marginLeft: "100px", marginTop: "60px", width: "150px"};
+export const normalButtonStyle = {marginLeft: "100px", marginTop: "30px", width: "150px"};
 
 export const CardPile = styled.div`
         margin: 5px;

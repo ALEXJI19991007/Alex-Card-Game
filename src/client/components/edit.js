@@ -32,7 +32,7 @@ export const Edit = props => {
     }
 
     return (
-        <div className="row">
+        <div className="row" style={{marginTop: "50px"}}>
             <div className="col-sm-12 mx-auto">
                 <div id="errorMsg" className="bg-danger" style={{textAlign: "center"}}>{editError}</div>
             </div>

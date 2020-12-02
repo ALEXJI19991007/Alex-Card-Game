@@ -5,7 +5,7 @@ import React from "react";
 import {withRouter} from 'react-router';
 
 import {Pile} from "./pile";
-import {autoCompleteButtonStyle, cardRowGapStyle, cardRowStyle} from "./styles";
+import {autoCompleteButtonStyle, cardRowGapStyle, cardRowStyle, normalButtonStyle} from "./styles";
 
 export class Game extends React.Component {
     constructor(props) {
@@ -86,7 +86,7 @@ export class Game extends React.Component {
 
         let move = null;
         if (cardInfo.pile === "draw" && isSelectedCard && isSrcCardUnselected) {
-            console.log("Draw Cards");
+            // console.log("Draw Cards");
             move = {
                 cards: this.state.draw.slice(-this.state.drawCount),
                 src: "draw",
@@ -100,7 +100,7 @@ export class Game extends React.Component {
             });
             await this.sendMove(move);
         } else if (cardInfo.pile === "draw" && this.state.draw.length === 0) {
-            console.log("Reset Draw Pile");
+            // console.log("Reset Draw Pile");
             move = {
                 cards: this.state.discard.slice().reverse(),
                 src: "discard",
@@ -112,7 +112,7 @@ export class Game extends React.Component {
             });
             await this.sendMove(move);
         } else if (isSrcCardUnselected && isSelectedCard && cardInfo.card.up) {
-            console.log("Set First Card");
+            // console.log("Set First Card");
             let srcPile = this.state[cardInfo.pile];
             let cardIndex = srcPile.indexOf(cardInfo.card);
             this.setState({
@@ -121,7 +121,7 @@ export class Game extends React.Component {
                 selectedRange: [cardIndex, srcPile.length - 1]
             });
         } else if ((isSelectedCard && !cardInfo.card.up) || isSrcCardUnselected || this.state.srcCard.pile === cardInfo.pile) {
-            console.log("Illegal Move");
+            // console.log("Illegal Move");
             this.setState({
                 selectedPile: "",
                 selectedRange: [-1, -1],
@@ -129,7 +129,7 @@ export class Game extends React.Component {
                 dstCard: null
             });
         } else {
-            console.log("Execute Move");
+            // console.log("Execute Move");
             let srcPile = this.state.srcCard.pile;
             let cardIndex = this.state[srcPile].indexOf(this.state.srcCard.card);
             move = {
@@ -159,7 +159,7 @@ export class Game extends React.Component {
             },
         })
         if (response.status === 202) {
-            console.log(move);
+            // console.log(move);
             let data = await response.json();
             let end = this.checkEndGame(data);
             this.setState({
@@ -289,7 +289,7 @@ export class Game extends React.Component {
         })
         if (response.status === 202) {
             let data = await response.json();
-            console.log(`Undo to state ${data.stateIndex}`);
+            // console.log(`Undo to state ${data.stateIndex}`);
             this.setState({
                 pile1: data.pile1,
                 pile2: data.pile2,
@@ -325,7 +325,7 @@ export class Game extends React.Component {
         })
         if (response.status === 202) {
             let data = await response.json();
-            console.log(`Redo to state ${data.stateIndex}`);
+            // console.log(`Redo to state ${data.stateIndex}`);
             this.setState({
                 pile1: data.pile1,
                 pile2: data.pile2,
@@ -357,7 +357,7 @@ export class Game extends React.Component {
         })
         let data = await response.json();
         if (response.status === 202) {
-            console.log("End Game");
+            // console.log("End Game");
             this.setState({
                 active: data.active
             });
@@ -368,28 +368,28 @@ export class Game extends React.Component {
 
     getEndButton() {
         return this.state.active ?
-        <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} disabled={!this.state.endGame} onClick={this.endGame}>
+        <button id="btn" className="btn btn-danger" style={normalButtonStyle} disabled={!this.state.endGame} onClick={this.endGame}>
             End Game
         </button> : undefined;
     }
 
     getAutoCompleteButton() {
         return this.state.active ?
-            <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} disabled={this.state.endGame} onClick={this.autoComplete}>
+            <button id="btn" className="btn btn-danger" style={autoCompleteButtonStyle} disabled={this.state.endGame} onClick={this.autoComplete}>
                 Auto-Complete
             </button> : undefined;
     }
 
     getUndoButton() {
         return this.state.active ?
-            <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.undo}>
+            <button id="btn" className="btn btn-danger" style={normalButtonStyle} onClick={this.undo}>
                 Undo
             </button> : undefined;
     }
 
     getRedoButton() {
         return this.state.active ?
-            <button id="btn" className="btn btn-primary" style={autoCompleteButtonStyle} onClick={this.redo}>
+            <button id="btn" className="btn btn-danger" style={normalButtonStyle} onClick={this.redo}>
                 Redo
             </button> : undefined;
     }

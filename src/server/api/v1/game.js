@@ -210,7 +210,7 @@ module.exports = (app) => {
                         res.status(500).send({error: "failure saving move"});
                     }
                 } else {
-                    res.status(400).send({error: "Invalid Move", state: state});
+                    res.status(204).send({error: "invalid move"});
                 }
             } else {
                 game.active = false;
