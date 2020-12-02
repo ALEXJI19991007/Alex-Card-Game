@@ -5,7 +5,6 @@ import React, {useState} from "react";
 import {withRouter} from "react-router";
 
 import {validUsername, validPassword} from "../../shared/index";
-import styled from "styled-components";
 
 export const Register = (props) => {
     const [state, setState] = useState({

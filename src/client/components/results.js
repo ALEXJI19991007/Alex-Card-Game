@@ -4,7 +4,6 @@
 import React, {useEffect, useState} from "react";
 import {withRouter} from "react-router";
 import {Link} from "react-router-dom";
-import game from "./game";
 
 const generalResult = (duration, numMoves, points, cardsRemaining, ableToMove) => {
     let hours = Math.floor(duration / 3600);
