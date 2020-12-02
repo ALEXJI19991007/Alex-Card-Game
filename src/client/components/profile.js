@@ -119,7 +119,7 @@ export const Profile = props => {
                         <tr>
                             <th>Status</th>
                             <th>Show Game / Result</th>
-                            <th>Start Date</th>
+                            <th>Last Played</th>
                             <th># of moves</th>
                             <th>Score</th>
                             <th>Game Type</th>

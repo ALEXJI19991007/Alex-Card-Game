@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import {withRouter} from "react-router";
 
 import {gravatarImg} from "../main";
-import {Bar, landingContainerStyle, RightNav, topLinkStyle} from "./styles";
+import {Bar, RightNav, topLinkStyle, topLinkStyleFirst} from "./styles";
 
 const Navbar = props => {
     const user = props.user.getUser();
@@ -27,9 +27,10 @@ const Navbar = props => {
     return (
         <Bar className="navbar navbar-default navbar-static-top">
             <div className="col-xs-8">
-                <Link to={"/"} style={topLinkStyle}>Home</Link>
+                <Link to={"/"} style={topLinkStyleFirst}>Home</Link>
                 <a href="https://www.linkedin.com/in/yu-ji-97a606192/" style={topLinkStyle}>Developer Profile</a>
                 <a href="https://en.wikipedia.org/wiki/Card_game" style={topLinkStyle}>About Card Game</a>
+                <Link to={"/functionality"} style={topLinkStyle}>Functionality Enabled</Link>
             </div>
             {rightOptions}
         </Bar>

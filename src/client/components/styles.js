@@ -95,7 +95,8 @@ export const RightNav = styled.div`
         padding-right: 20px;
     `;
 
-export const topLinkStyle = {marginLeft: "10px", color: "white"};
+export const topLinkStyleFirst = {marginLeft: "5px", color: "white"};
+export const topLinkStyle = {marginLeft: "20px", color: "white"};
 
 export const containerHeaderStyle = {
     alignItems: "center",

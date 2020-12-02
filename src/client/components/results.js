@@ -68,7 +68,7 @@ export const Results = (props) => {
     }, []);
 
     return (
-        <div className="row">
+        <div className="row" style={{marginTop: "20px"}}>
             <div className="col-sm-2"><h5>Game Detail</h5></div>
             <div className="col-sm-10">
                 <div className="row">

@@ -20,6 +20,7 @@ import Logout from "./components/logout";
 import Results from "./components/results";
 import Edit from "./components/edit";
 import Screenshot from "./components/screenshot";
+import {Functionality} from "./components/functionality";
 
 export class User {
   constructor(username, primary_email) {
@@ -64,6 +65,7 @@ const MyApp = () => {
         <div>
           <Navbar user={user}/>
           <Route exact path="/" component={Landing}/>
+          <Route exact path="/functionality" component={Functionality}/>
           <Route exact path="/register" render={props => <Register {...props}/>}/>
           <Route exact path="/login" render={props => <Login {...props} logIn={user}/>}/>
           <Route exact path="/logout" render={props => <Logout {...props} user={user}/>}/>
