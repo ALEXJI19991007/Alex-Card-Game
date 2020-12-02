@@ -36,7 +36,7 @@ export class User {
 
   logInHandler(router, userData) {
     this.userData = userData;
-    localStorage.setItem("user", JSON.stringify(this));
+    sessionStorage.setItem("user", JSON.stringify(this));
     router.push(`/profile/${userData.username}`);
   }
 
@@ -45,7 +45,7 @@ export class User {
       username: "",
       primary_email: ""
     }
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
     router.push("/login");
   }
 
@@ -55,7 +55,7 @@ export class User {
 }
 
 const MyApp = () => {
-  let curUser = JSON.parse(localStorage.getItem("user"));
+  let curUser = JSON.parse(sessionStorage.getItem("user"));
 
   const [user, setUser] = useState(curUser === null ?
       new User() : new User(curUser.userData.username, curUser.userData.primary_email));
