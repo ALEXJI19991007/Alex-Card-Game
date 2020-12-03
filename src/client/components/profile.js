@@ -38,9 +38,9 @@ const gameRecords = games => {
     ));
 }
 
-const editProfile = (userNameOnPage, userLoggedIn) => {
+const editProfile = (userNameOnPage, userLoggedIn, state) => {
     return userNameOnPage === userLoggedIn ?
-        <Link to={`/profile/${userNameOnPage}/edit`} style={{marginLeft: "205px"}}>Edit Profile</Link>
+        <Link to={{pathname: `/profile/${userNameOnPage}/edit`, curState: state}} style={{marginLeft: "205px"}}>Edit Profile</Link>
         : undefined;
 }
 
@@ -108,7 +108,7 @@ export const Profile = props => {
             </div>
             <div className="col-sm-8">
                 <ProfileBlock {...state} />
-                {editProfile(props.match.params.username, props.username)}
+                {editProfile(props.match.params.username, props.username, state)}
                 <div className="row" style={{marginTop: "20px"}}>
                     <div className="col-sm-12">
                         <h4>Games Played ({state.games.length}):</h4>

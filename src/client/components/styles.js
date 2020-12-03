@@ -67,8 +67,8 @@ export const cardRowStyle = {
 
 export const cardRowGapStyle = {marginLeft: "100px"};
 
-export const autoCompleteButtonStyle = {marginLeft: "100px", marginTop: "60px", width: "150px"};
-export const normalButtonStyle = {marginLeft: "100px", marginTop: "30px", width: "150px"};
+export const autoCompleteButtonStyle = {marginLeft: "100px", marginTop: "60px", width: "150px", size: "flex"};
+export const normalButtonStyle = {marginLeft: "100px", marginTop: "30px", width: "150px", size: "flex"};
 
 export const CardPile = styled.div`
         margin: 5px;
@@ -129,3 +129,48 @@ export const FooterP = styled.p`
         text-align: center;
         color: white;
     `;
+
+const NotifyBase = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NotifyBox = styled.div`
+  padding: 2em;
+  border: 1px solid #000;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+`;
+
+const FormButton = styled.button`
+  max-width: 200px;
+  min-width: 150px;
+  max-height: 2em;
+  background: #6495ed;
+  border: none;
+  border-radius: 5px;
+  line-height: 2em;
+  font-size: 0.8em;
+`;
+
+export const ModalNotify = ({ msg, onAccept }) => {
+    return (
+        <NotifyBase>
+            <NotifyBox>
+                <p>{msg}</p>
+                {<FormButton onClick={onAccept}>Ok</FormButton>}
+            </NotifyBox>
+        </NotifyBase>
+    );
+};

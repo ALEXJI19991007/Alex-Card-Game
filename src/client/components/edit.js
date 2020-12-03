@@ -3,9 +3,9 @@ import {withRouter} from 'react-router-dom';
 
 export const Edit = props => {
     const [state, setState] = useState({
-        first_name: "",
-        last_name: "",
-        city: "",
+        first_name: props.location.curState.firstname,
+        last_name: props.location.curState.lastname,
+        city: props.location.curState.city,
     });
     const [editError] = useState("");
 
@@ -42,20 +42,21 @@ export const Edit = props => {
                         <label className="col-sm-3 col-form-label" htmlFor="first_name">First Name:</label>
                         <div className="col-sm-9">
                             <input className="form-control" id="first_name" name="first_name" type="text"
-                                   placeholder="First Name" onChange={onClick}/>
+                                   placeholder="First Name" defaultValue={state.first_name} onChange={onClick}/>
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label" htmlFor="last_name">Last Name:</label>
                         <div className="col-sm-9">
                             <input className="form-control" id="last_name" name="last_name" type="text"
-                                   placeholder="Last Name" onChange={onClick}/>
+                                   placeholder="Last Name" defaultValue={state.last_name} onChange={onClick}/>
                         </div>
                     </div>
                     <div className="form-group row">
                         <label className="col-sm-3 col-form-label" htmlFor="city">City:</label>
                         <div className="col-sm-9">
-                            <input className="form-control" id="city" name="city" type="text" placeholder="City" onChange={onClick}/>
+                            <input className="form-control" id="city" name="city" type="text"
+                                   placeholder="City" defaultValue={state.city} onChange={onClick}/>
                         </div>
                     </div>
                     <div className="form-group row">

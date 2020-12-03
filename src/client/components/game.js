@@ -5,7 +5,12 @@ import React from "react";
 import {withRouter} from 'react-router';
 
 import {Pile} from "./pile";
-import {autoCompleteButtonStyle, cardRowGapStyle, cardRowStyle, normalButtonStyle} from "./styles";
+import {
+    autoCompleteButtonStyle,
+    cardRowGapStyle,
+    cardRowStyle, ModalNotify,
+    normalButtonStyle
+} from "./styles";
 
 export class Game extends React.Component {
     constructor(props) {
@@ -43,6 +48,7 @@ export class Game extends React.Component {
         this.redo = this.redo.bind(this);
         this.endGame = this.endGame.bind(this);
         this.checkEndGame = this.checkEndGame.bind(this);
+        this.checkWin = this.checkWin.bind(this);
     }
 
     componentDidMount() {
@@ -361,6 +367,7 @@ export class Game extends React.Component {
             this.setState({
                 active: data.active
             });
+            this.props.history.push(`/profile/${this.props.username}`);
         } else {
             console.log(data.error);
         }
@@ -394,6 +401,11 @@ export class Game extends React.Component {
             </button> : undefined;
     }
 
+    checkWin() {
+        return this.state.stack1.length === 13 && this.state.stack2.length === 13
+             && this.state.stack3.length === 13 && this.state.stack4.length === 13;
+    }
+
     render() {
         return (
             <div className="row" onClick={this.onBackgroundClick}>
@@ -423,6 +435,13 @@ export class Game extends React.Component {
                         <Pile cards={this.state.pile6} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile6" onClick={this.onCardClick}/>
                         <Pile cards={this.state.pile7} selectedPile={this.state.selectedPile} selectedRange={this.state.selectedRange} id="pile7" onClick={this.onCardClick}/>
                     </div>
+                    { this.checkWin() && this.state.active ? (
+                        <ModalNotify
+                            id="notification"
+                            msg="Congratulations! You Win!!"
+                            onAccept={this.endGame}
+                        />
+                    ) : null }
                 </div>
             </div>
         );
