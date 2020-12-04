@@ -27,7 +27,7 @@ const Move = ({gameId, move, index}) => {
     return (
         <tr key={index}>
             <th>{index}</th>
-            <th>{move.player}</th>
+            <th><Link to={`/profile/${move.player}`}>{move.player}</Link></th>
             <th><Link to={{pathname: url}}>{text}</Link></th>
         </tr>
     );
